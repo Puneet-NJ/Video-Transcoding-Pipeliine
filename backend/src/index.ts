@@ -24,4 +24,29 @@ app.get("/signedUrl/:objectName", async (req, res) => {
 	}
 });
 
+app.put("/video/:videoId", async (req, res) => {
+	try {
+		const videoId = req.params.videoId;
+		const body = req.body;
+
+		const response = await client.video.update({
+			where: { id: videoId },
+			data: {
+				status: body.status,
+			},
+		});
+
+		res.json({ msg: "Done" });
+	} catch (err) {
+		res.status(500).json({ msg: "Internal Server Error" });
+	}
+});
+
+app.get("/video/:videoId", async (req, res) => {
+	try {
+	} catch (err) {
+		res.status(500).json({ msg: "Internal Server Error" });
+	}
+});
+
 app.listen(5001);

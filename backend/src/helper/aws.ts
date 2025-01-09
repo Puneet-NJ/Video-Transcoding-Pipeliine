@@ -25,3 +25,13 @@ export const genSignedUrlTemp = (objectKey: string) => {
 		ContentType: "video/mp4",
 	});
 };
+
+export const genSignedUrl = () => {
+	initAwsTemp();
+
+	return s3Temp.getSignedUrlPromise("getObject", {
+		Bucket: "puneet-video-transcoding",
+		Key: objectKey,
+		Expires: 240,
+	});
+};
