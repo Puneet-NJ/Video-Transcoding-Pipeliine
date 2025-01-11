@@ -1,24 +1,30 @@
 import AWS from "aws-sdk";
+import { getSignedUrl } from "aws-cloudfront-sign";
 
-let s3Temp: AWS.S3;
+var cfSigningParams = {
+	keypairId: process.env.PUBLIC_KEY as string,
+	privateKeyString: process.env.PRIVATE_KEY as string,
+};
 
-const initAwsTemp = () => {
-	if (s3Temp instanceof AWS.S3) return s3Temp;
+let s3: AWS.S3;
 
-	s3Temp = new AWS.S3({
+const initAws = () => {
+	if (s3 instanceof AWS.S3) return s3;
+
+	s3 = new AWS.S3({
 		accessKeyId: process.env.AWS_ACCESS_KEY_ID,
 		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 		signatureVersion: "v4",
 		region: "ap-south-1",
 	});
 
-	return s3Temp;
+	return s3;
 };
 
 export const genSignedUrlTemp = (objectKey: string) => {
-	initAwsTemp();
+	initAws();
 
-	return s3Temp.getSignedUrlPromise("putObject", {
+	return s3.getSignedUrlPromise("putObject", {
 		Bucket: "puneet-video-transcoding-temp",
 		Key: objectKey,
 		Expires: 240,
@@ -26,12 +32,11 @@ export const genSignedUrlTemp = (objectKey: string) => {
 	});
 };
 
-export const genSignedUrl = () => {
-	initAwsTemp();
+export const genSignedUrl = (objectKey: string) => {
+	const signedUrl = getSignedUrl(
+		process.env.CLOUDFRONT_URL + `/${objectKey}`,
+		cfSigningParams
+	);
 
-	return s3Temp.getSignedUrlPromise("getObject", {
-		Bucket: "puneet-video-transcoding",
-		Key: objectKey,
-		Expires: 240,
-	});
+	return signedUrl;
 };

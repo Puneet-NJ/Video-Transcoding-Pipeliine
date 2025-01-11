@@ -170,9 +170,9 @@ const putChunks = async (
 
 				s3FolderName = `${videoId}/${eachQualityFolder}/${chunk}`;
 
-				if (chunk.includes("m3u8")) {
-					s3FolderName = `${videoId}/m3u8/${chunk}`;
-				}
+				// if (chunk.includes("m3u8")) {
+				// 	s3FolderName = `${videoId}/m3u8/${chunk}`;
+				// }
 
 				promises.push(uploadToS3(s3FolderName, path.join(pa, chunk)));
 			});

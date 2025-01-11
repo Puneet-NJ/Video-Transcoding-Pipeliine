@@ -1,7 +1,7 @@
 import express from "express";
 import "dotenv/config";
 import client from "./helper/prisma";
-import { genSignedUrlTemp } from "./helper/aws";
+import { genSignedUrl, genSignedUrlTemp } from "./helper/aws";
 import cors from "cors";
 
 const app = express();
@@ -42,9 +42,28 @@ app.put("/video/:videoId", async (req, res) => {
 	}
 });
 
+app.get("/videos", async (req, res) => {
+	try {
+		const videos = await client.video.findMany({});
+
+		res.json({ videos });
+	} catch (err) {
+		res.status(500).json({ msg: "Internal Server Error" });
+	}
+});
+
 app.get("/video/:videoId", async (req, res) => {
 	try {
+		const videoId = req.params.videoId;
+
+		const m3u8 = `${videoId}/480p/480p.m3u8`;
+
+		const signedUrl = genSignedUrl(m3u8);
+
+		res.json({ signedUrl });
 	} catch (err) {
+		console.log(err);
+
 		res.status(500).json({ msg: "Internal Server Error" });
 	}
 });
